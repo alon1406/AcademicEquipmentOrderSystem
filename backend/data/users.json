@@ -2,25 +2,22 @@
   {
     "id": 1,
     "username": "admin",
-    "password": "admin123",
+    "email": "admin@example.com",
+    "password": "12345678",
     "role": "admin"
   },
   {
     "id": 2,
-    "username": "john_pm",
-    "password": "pm123",
+    "username": "Alon123",
+    "email": "alon123@gmail.com",
+    "password": "12345678",
     "role": "procurement_manager"
   },
   {
     "id": 3,
-    "username": "customer_user",
-    "password": "customer123",
-    "role": "customer"
-  },
-  {
-    "id": 4,
-    "username": "Daniel123",
-    "password": "default123",
+    "username": "daniel012",
+    "email": "daniel@gmail.com",
+    "password": "12345678",
     "role": "customer"
   }
 ]

@@ -22,6 +22,18 @@ async function fetchApi(endpoint, options = {}) {
   return response.json();
 }
 
+// ============ Auth API ============
+export const authApi = {
+  /**
+   * Login with username and password
+   * TODO: [SECURITY] Add JWT token handling in future
+   */
+  login: (username, password) => fetchApi('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  }),
+};
+
 // ============ Users API ============
 export const usersApi = {
   getAll: () => fetchApi('/users'),

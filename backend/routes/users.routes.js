@@ -28,17 +28,28 @@ router.get('/:id', (req, res) => {
 // POST /api/users - Create new user
 router.post('/', (req, res) => {
   const users = readData(FILENAME);
+  
+  // Validate required fields
+  if (!req.body.username || !req.body.password) {
+    return res.status(400).json({ error: 'Username and password are required' });
+  }
+  
+  // TODO: [SECURITY] Hash password before storing
+  // Future upgrade: const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const plaintextPassword = req.body.password; // Plaintext storage - temporary
+  
   const newUser = {
     id: getNextId(users),
     username: req.body.username,
-    password: req.body.password || 'default123',
+    email: req.body.email || '',
+    password: plaintextPassword,
     role: req.body.role || 'customer'
   };
   
   users.push(newUser);
   writeData(FILENAME, users);
   
-  const { password, ...safeUser } = newUser;
+  const { password: _pwd, ...safeUser } = newUser;
   res.status(201).json(safeUser);
 });
 
@@ -51,11 +62,18 @@ router.put('/:id', (req, res) => {
     return res.status(404).json({ error: 'User not found' });
   }
   
+  // TODO: [SECURITY] Hash password before storing if password is being updated
+  // Future upgrade: const hashedPassword = req.body.password ? await bcrypt.hash(req.body.password, 10) : undefined;
+  // Handle missing password gracefully for existing users
+  const existingPassword = users[index].password || 'default123';
+  const newPassword = req.body.password || existingPassword; // Plaintext storage - temporary
+  
   users[index] = {
     ...users[index],
     username: req.body.username ?? users[index].username,
+    email: req.body.email ?? users[index].email,
     role: req.body.role ?? users[index].role,
-    password: req.body.password ?? users[index].password
+    password: newPassword
   };
   
   writeData(FILENAME, users);

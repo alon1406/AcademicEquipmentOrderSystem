@@ -12,7 +12,8 @@ import {
   Activity,
   LogOut,
   Menu,
-  X
+  X,
+  User
 } from 'lucide-react';
 
 function NavItem({ icon: Icon, label, path, active, onClick }) {
@@ -28,11 +29,15 @@ function NavItem({ icon: Icon, label, path, active, onClick }) {
 }
 
 function LayoutContent({ children }) {
-  const { currentUser, users, login, isLoading } = useAuth();
+  const { currentUser, logout, isLoading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   if (isLoading) {
     return <div className="loading-screen">Loading system...</div>;
@@ -65,12 +70,6 @@ function LayoutContent({ children }) {
 
   const navItems = getNavItems();
 
-  const getRoleClass = (role) => {
-    if (role === ROLE_ADMIN) return 'role-admin';
-    if (role === ROLE_PROCUREMENT_MANAGER) return 'role-manager';
-    return 'role-customer';
-  };
-
   return (
     <div className="app-layout">
       {/* Desktop Sidebar */}
@@ -89,47 +88,27 @@ function LayoutContent({ children }) {
           <div className="session-card">
             <p className="session-label">Current Session</p>
             <div className="session-info">
-              <div>
-                <p className="session-username">
-                  {currentUser?.username || 'Guest'}
-                </p>
-                <p className="session-role">
-                  {currentUser?.role?.replace('_', ' ') || 'No Role'}
-                </p>
+              <div className="session-user-info">
+                <div className="session-avatar">
+                  <User size={16} />
+                </div>
+                <div>
+                  <p className="session-username">
+                    {currentUser?.username || 'Guest'}
+                  </p>
+                  <p className="session-role">
+                    {currentUser?.role?.replace(/_/g, ' ') || 'No Role'}
+                  </p>
+                </div>
               </div>
               
-              <div className="dropdown">
-                <button 
-                  className="btn btn-ghost btn-icon"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                >
-                  <LogOut size={16} />
-                </button>
-                
-                {isDropdownOpen && (
-                  <div className="dropdown-menu">
-                    <div className="dropdown-label">Switch User (Demo Mode)</div>
-                    <div className="dropdown-separator" />
-                    {users.map(u => (
-                      <button
-                        key={u.id}
-                        className="dropdown-item"
-                        onClick={() => {
-                          login(u);
-                          setIsDropdownOpen(false);
-                        }}
-                      >
-                        <span className={`role-dot ${getRoleClass(u.role)}`}></span>
-                        <div style={{ flex: 1 }}>
-                          <div>{u.username}</div>
-                          <div className="text-xs text-slate-400 capitalize">{u.role.replace('_', ' ')}</div>
-                        </div>
-                        {currentUser?.id === u.id && <span className="text-xs">✓</span>}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <button 
+                className="btn btn-ghost btn-icon"
+                onClick={handleLogout}
+                title="Sign out"
+              >
+                <LogOut size={16} />
+              </button>
             </div>
           </div>
         </div>

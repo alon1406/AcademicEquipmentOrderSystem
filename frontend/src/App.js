@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-import { AuthProvider } from './components/AuthContext';
+import { AuthProvider, useAuth } from './components/AuthContext';
 import { RoleGuard } from './components/RoleGuard';
-import { ROLE_ADMIN, ROLE_PROCUREMENT_MANAGER } from './constants/roles';
+import { ROLE_ADMIN, ROLE_PROCUREMENT_MANAGER, ROLE_CUSTOMER } from './constants/roles';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Catalog from './pages/Catalog';
 import Orders from './pages/Orders';
@@ -12,71 +13,132 @@ import ManageProducts from './pages/ManageProducts';
 import Logs from './pages/Logs';
 import Reports from './pages/Reports';
 
-function Home() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="page-title">Welcome to EduEquip</h1>
-        <p className="page-subtitle">Academic Equipment Order System</p>
-      </div>
-      <div className="card">
-        <div className="card-body p-8">
-          <p className="text-slate-600">Select a section from the navigation menu to get started.</p>
-        </div>
-      </div>
-    </div>
-  );
+/**
+ * Redirects authenticated users to their default page based on role
+ */
+function LoginRoute() {
+  const { currentUser, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
+  // If already logged in, redirect to appropriate page
+  if (currentUser) {
+    if (currentUser.role === ROLE_ADMIN || currentUser.role === ROLE_PROCUREMENT_MANAGER) {
+      return <Navigate to="/dashboard" replace />;
+    }
+    return <Navigate to="/catalog" replace />;
+  }
+
+  return <Login />;
+}
+
+/**
+ * Redirects root path to appropriate page based on auth status and role
+ */
+function HomeRedirect() {
+  const { currentUser, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Redirect based on role
+  if (currentUser.role === ROLE_ADMIN || currentUser.role === ROLE_PROCUREMENT_MANAGER) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <Navigate to="/catalog" replace />;
 }
 
 function AppRoutes() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<RoleGuard><Home /></RoleGuard>} />
-        <Route
-          path="/dashboard"
-          element={
+    <Routes>
+      {/* Public route - Login page */}
+      <Route path="/login" element={<LoginRoute />} />
+      
+      {/* Root redirect */}
+      <Route path="/" element={<HomeRedirect />} />
+      
+      {/* Protected routes - wrapped in Layout */}
+      <Route
+        path="/dashboard"
+        element={
+          <Layout>
             <RoleGuard allowedRoles={[ROLE_ADMIN, ROLE_PROCUREMENT_MANAGER]}>
               <Dashboard />
             </RoleGuard>
-          }
-        />
-        <Route path="/catalog" element={<RoleGuard><Catalog /></RoleGuard>} />
-        <Route path="/orders" element={<RoleGuard><Orders /></RoleGuard>} />
-        <Route
-          path="/users"
-          element={
+          </Layout>
+        }
+      />
+      <Route
+        path="/catalog"
+        element={
+          <Layout>
+            <RoleGuard allowedRoles={[ROLE_ADMIN, ROLE_PROCUREMENT_MANAGER, ROLE_CUSTOMER]}>
+              <Catalog />
+            </RoleGuard>
+          </Layout>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <Layout>
+            <RoleGuard allowedRoles={[ROLE_ADMIN, ROLE_PROCUREMENT_MANAGER, ROLE_CUSTOMER]}>
+              <Orders />
+            </RoleGuard>
+          </Layout>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <Layout>
             <RoleGuard allowedRoles={[ROLE_ADMIN]}>
               <ManageUsers />
             </RoleGuard>
-          }
-        />
-        <Route
-          path="/manageproducts"
-          element={
+          </Layout>
+        }
+      />
+      <Route
+        path="/manageproducts"
+        element={
+          <Layout>
             <RoleGuard allowedRoles={[ROLE_ADMIN]}>
               <ManageProducts />
             </RoleGuard>
-          }
-        />
-        <Route
-          path="/logs"
-          element={
+          </Layout>
+        }
+      />
+      <Route
+        path="/logs"
+        element={
+          <Layout>
             <RoleGuard allowedRoles={[ROLE_ADMIN]}>
               <Logs />
             </RoleGuard>
-          }
-        />
-        <Route
-          path="/reports"
-          element={
+          </Layout>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <Layout>
             <RoleGuard allowedRoles={[ROLE_ADMIN, ROLE_PROCUREMENT_MANAGER]}>
               <Reports />
             </RoleGuard>
-          }
-        />
-      </Routes>
-    </Layout>
+          </Layout>
+        }
+      />
+      
+      {/* Catch-all redirect */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 

@@ -13,6 +13,7 @@ export default function ManageUsers() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    password: '',
     role: ROLE_CUSTOMER
   });
 
@@ -38,7 +39,7 @@ export default function ManageUsers() {
   ];
 
   const handleNew = () => {
-    setFormData({ username: '', email: '', role: ROLE_CUSTOMER });
+    setFormData({ username: '', email: '', password: '', role: ROLE_CUSTOMER });
     setEditingId(null);
     setShowForm(true);
   };
@@ -47,6 +48,7 @@ export default function ManageUsers() {
     setFormData({
       username: user.username,
       email: user.email || '',
+      password: '', // Password field is empty on edit - only set if admin wants to change it
       role: user.role
     });
     setEditingId(user.id);
@@ -69,20 +71,29 @@ export default function ManageUsers() {
   const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.username.trim() || !formData.email.trim()) {
-      alert('Please fill in all fields');
+      alert('Please fill in username and email');
+      return;
+    }
+    // Password is required only when creating a new user
+    if (!editingId && !formData.password.trim()) {
+      alert('Password is required for new users');
       return;
     }
 
     try {
       if (editingId) {
-        const updated = await usersApi.update(editingId, formData);
+        // Only include password in update if it was changed
+        const updateData = formData.password.trim()
+          ? formData
+          : { username: formData.username, email: formData.email, role: formData.role };
+        const updated = await usersApi.update(editingId, updateData);
         setUsers(users.map(u => u.id === editingId ? updated : u));
       } else {
         const newUser = await usersApi.create(formData);
         setUsers([...users, newUser]);
       }
       setShowForm(false);
-      setFormData({ username: '', email: '', role: ROLE_CUSTOMER });
+      setFormData({ username: '', email: '', password: '', role: ROLE_CUSTOMER });
       refreshUsers();
     } catch (error) {
       console.error('Failed to save user:', error);
@@ -144,6 +155,20 @@ export default function ManageUsers() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="form-input"
                   placeholder="Enter email"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">
+                  Password {editingId ? '(leave empty to keep current)' : '*'}
+                </label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="form-input"
+                  placeholder={editingId ? 'Enter new password (optional)' : 'Enter password'}
+                  required={!editingId}
                 />
               </div>
 

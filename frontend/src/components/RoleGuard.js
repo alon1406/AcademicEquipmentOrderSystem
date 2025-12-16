@@ -1,8 +1,10 @@
 import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 export function RoleGuard({ children, allowedRoles = [] }) {
   const { currentUser, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -12,17 +14,12 @@ export function RoleGuard({ children, allowedRoles = [] }) {
     );
   }
 
+  // Redirect to login if not authenticated
   if (!currentUser) {
-    return (
-      <div className="loading-screen">
-        <div className="text-center">
-          <h1 className="text-danger font-bold" style={{ fontSize: '1.5rem' }}>Authentication Required</h1>
-          <p className="text-slate-600 mt-2">Please select a user to continue.</p>
-        </div>
-      </div>
-    );
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Check role-based access
   if (allowedRoles.length > 0 && !allowedRoles.includes(currentUser.role)) {
     return (
       <div className="loading-screen">

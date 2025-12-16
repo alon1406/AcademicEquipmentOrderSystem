@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 // Import routes
+const authRoutes = require('./routes/auth.routes');
 const usersRoutes = require('./routes/users.routes');
 const productsRoutes = require('./routes/products.routes');
 const ordersRoutes = require('./routes/orders.routes');
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Mount routes
+app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
@@ -36,6 +38,7 @@ app.listen(PORT, () => {
   console.log(`🚀 Backend server running on http://localhost:${PORT}`);
   console.log(`📁 Data stored in JSON files at ./data/`);
   console.log(`\nAvailable endpoints:`);
+  console.log(`  POST   /api/auth/login`);
   console.log(`  GET    /api/health`);
   console.log(`  GET    /api/users`);
   console.log(`  GET    /api/products`);
