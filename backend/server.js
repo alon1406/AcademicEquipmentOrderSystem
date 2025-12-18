@@ -35,7 +35,7 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+  console.log(`🚀 Backend server running on http://localhost:${PORT}/api/health`);
   console.log(`📁 Data stored in JSON files at ./data/`);
   console.log(`\nAvailable endpoints:`);
   console.log(`  POST   /api/auth/login`);

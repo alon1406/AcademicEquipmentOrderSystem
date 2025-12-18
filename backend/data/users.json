@@ -19,5 +19,12 @@
     "email": "daniel@gmail.com",
     "password": "12345678",
     "role": "customer"
+  },
+  {
+    "id": 4,
+    "username": "ofir123",
+    "email": "ofir123@gmail.com",
+    "password": "12345678",
+    "role": "procurement_manager"
   }
 ]
