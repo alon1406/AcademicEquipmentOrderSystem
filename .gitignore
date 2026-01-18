@@ -16,8 +16,13 @@ yarn-error.log*
 .env.test
 .env.production
 
-# Python
+
+# Python virtual environments
 **/venv/
+**/.venv/
+
+# Python cache
+>>>>>>> 023fb32 (changed jwt to 1hr and salt for 12 rounds)
 __pycache__/
 *.pyc
 *.pyo
@@ -29,6 +34,19 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+
+
+
+# HuggingFace cache
+**/.cache/
+**/.huggingface/
+
+# SSL / TLS certificates
+*.key
+*.crt
+*.pem
+*.csr
+
 
 # IDE/Editor
 .vscode/
@@ -51,6 +69,7 @@ coverage/
 
 # Build artifacts
 *.tsbuildinfo
+<<<<<<< HEAD
 
 # Package lock files (optional - some teams ignore these)
 # package-lock.json
@@ -67,3 +86,5 @@ supabase/.temp/
 # Misc
 .eslintcache
 *.tmp
+=======
+>>>>>>> 023fb32 (changed jwt to 1hr and salt for 12 rounds)

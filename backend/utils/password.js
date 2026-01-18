@@ -11,7 +11,10 @@ const bcrypt = require('bcrypt');
 
 // Salt rounds - higher = more secure but slower
 // 10-12 is recommended for production
-const SALT_ROUNDS = 10;
+
+
+const SALT_ROUNDS = 12;
+
 
 /**
  * Hash a plaintext password

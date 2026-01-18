@@ -5,10 +5,12 @@ const { logAuditAction, AUDIT_ACTIONS, SYSTEM_USER_ID, getClientIp } = require('
 const { generateToken } = require('../utils/jwt');
 const { authenticate } = require('../middleware/auth.middleware');
 const { verifyPassword } = require('../utils/password');
+
 const { loginLimiter } = require('../middleware/rateLimiter');
 const { validateLogin } = require('../middleware/validators');
 
 // POST /api/auth/login - Authenticate user
+
 router.post('/login', loginLimiter, validateLogin, async (req, res) => {
   console.log(`[${req.method}] ${req.originalUrl}`);
   
